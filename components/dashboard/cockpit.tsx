@@ -133,11 +133,11 @@ export function Cockpit() {
       {/* trajectory + daily movement */}
       <section className="grid grid-cols-1 gap-s5 lg:grid-cols-2">
         <Card className="p-s6">
-          <SectionHeader overline="Prognose" title="Avskrivningsbane — 3 måneder" />
+          <SectionHeader overline="Prognose" title="Avskrivningsbane (3 måneder)" />
           <LineChart data={trajectory} formatValue={(n) => `${formatNumber(n)} NOK`} color="#E5484D" />
           <Takeaway>
-            {formatCompactShort(agg.becoming)} NOK blir avskrevet de neste 3 månedene uten tiltak —{" "}
-            {formatCompactShort(agg.imminent)} NOK allerede innen 1 måned.
+            {formatCompactShort(agg.becoming)} NOK blir avskrevet de neste 3 månedene uten tiltak,{" "}
+            hvorav {formatCompactShort(agg.imminent)} NOK allerede innen 1 måned.
           </Takeaway>
         </Card>
 
@@ -150,8 +150,8 @@ export function Cockpit() {
                 {dod === null || dod === 0
                   ? "Uendret siden forrige opplasting."
                   : dod < 0
-                    ? `Old stock er redusert med ${formatCompactShort(Math.abs(dod))} NOK siden forrige opplasting — riktig retning.`
-                    : `Old stock har økt med ${formatCompactShort(dod)} NOK siden forrige opplasting — vurder tiltak.`}
+                    ? `Old stock er redusert med ${formatCompactShort(Math.abs(dod))} NOK siden forrige opplasting. Riktig retning.`
+                    : `Old stock har økt med ${formatCompactShort(dod)} NOK siden forrige opplasting. Vurder tiltak.`}
               </Takeaway>
             </>
           ) : (
@@ -233,7 +233,7 @@ export function Cockpit() {
         ) : (
           <EmptyState
             tone="positive"
-            title="Ingen fokusvarer akkurat nå — bra jobba."
+            title="Ingen fokusvarer akkurat nå. Bra jobba!"
             description="Ingenting krysser tiltaksgrensen i dette utvalget. Last opp etter neste lageruttrekk for å ligge i forkant."
           />
         )}

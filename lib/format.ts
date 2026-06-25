@@ -7,7 +7,7 @@ const NBSP = " ";
 
 /** Full integer NOK with grouped thousands, e.g. 1 245 000. */
 export function formatNumber(n: number, maxFractionDigits = 0): string {
-  if (!isFinite(n)) return "–";
+  if (!isFinite(n)) return "·";
   return new Intl.NumberFormat("nb-NO", {
     maximumFractionDigits: maxFractionDigits,
     minimumFractionDigits: 0,
@@ -47,7 +47,7 @@ function formatDecimal(n: number, digits: number): string {
 
 /** Signed percent, e.g. +8 %, -4 %. Returns "–" when pct is null. */
 export function formatPct(pct: number | null, signed = true, digits = 0): string {
-  if (pct === null || !isFinite(pct)) return "–";
+  if (pct === null || !isFinite(pct)) return "·";
   const formatted = formatDecimal(Math.abs(pct), digits);
   const sign = pct > 0 ? "+" : pct < 0 ? "−" : "";
   return `${signed ? sign : ""}${formatted}${NBSP}%`;

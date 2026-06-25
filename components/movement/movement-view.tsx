@@ -59,9 +59,9 @@ export function MovementView() {
   const columns: Column<(typeof rows)[number]>[] = [
     { key: "date", header: "Dato", width: "minmax(110px,1fr)", sortValue: (r) => r.snapshot.date, render: (r) => <span className="font-medium text-ink-primary">{formatDateShort(r.snapshot.date)}</span> },
     { key: "obs", header: "Old stock", width: "120px", align: "right", sortValue: (r) => r.snapshot.aggregates.obsoleteNow, render: (r) => formatCompactShort(r.snapshot.aggregates.obsoleteNow) },
-    { key: "delta", header: "Endring", width: "110px", align: "right", sortValue: (r) => r.delta ?? 0, render: (r) => r.delta === null ? "—" : <span style={{ color: r.delta > 0 ? "#E5484D" : r.delta < 0 ? "#15924C" : "#8A98AC" }}>{formatSignedCompact(r.delta)}</span> },
-    { key: "cleared", header: "Jobbet ned", width: "110px", align: "right", sortValue: (r) => r.cleared ?? 0, render: (r) => r.cleared === null ? "—" : <span className="text-risk-healthy">{formatCompactShort(r.cleared)}</span> },
-    { key: "new", header: "Ny avskrivning", width: "130px", align: "right", sortValue: (r) => r.newObs ?? 0, render: (r) => r.newObs === null ? "—" : <span className="text-risk-critical">{formatCompactShort(r.newObs)}</span> },
+    { key: "delta", header: "Endring", width: "110px", align: "right", sortValue: (r) => r.delta ?? 0, render: (r) => r.delta === null ? "·" : <span style={{ color: r.delta > 0 ? "#E5484D" : r.delta < 0 ? "#15924C" : "#8A98AC" }}>{formatSignedCompact(r.delta)}</span> },
+    { key: "cleared", header: "Jobbet ned", width: "110px", align: "right", sortValue: (r) => r.cleared ?? 0, render: (r) => r.cleared === null ? "·" : <span className="text-risk-healthy">{formatCompactShort(r.cleared)}</span> },
+    { key: "new", header: "Ny avskrivning", width: "130px", align: "right", sortValue: (r) => r.newObs ?? 0, render: (r) => r.newObs === null ? "·" : <span className="text-risk-critical">{formatCompactShort(r.newObs)}</span> },
   ];
 
   return (
@@ -72,7 +72,7 @@ export function MovementView() {
         <KpiCard
           label="Siden forrige opplasting"
           value={vsPrev ? Math.abs(vsPrev.delta) : 0}
-          formatValue={(n) => (vsPrev ? `${vsPrev.delta > 0 ? "+" : vsPrev.delta < 0 ? "−" : ""}${formatCompactValue(n).value}` : "—")}
+          formatValue={(n) => (vsPrev ? `${vsPrev.delta > 0 ? "+" : vsPrev.delta < 0 ? "−" : ""}${formatCompactValue(n).value}` : "·")}
           unit={vsPrev ? formatCompactValue(Math.abs(vsPrev.delta)).unit : ""}
           deltaLabel={vsPrev ? `${formatPct(vsPrev.deltaPct)}` : "Trenger 2+ opplastinger"}
           deltaTone={!vsPrev ? "neutral" : vsPrev.delta > 0 ? "bad" : "good"}
@@ -80,7 +80,7 @@ export function MovementView() {
         <KpiCard
           label="Reduksjon denne uken"
           value={weeklyReduction !== null ? Math.max(0, weeklyReduction) : 0}
-          formatValue={(n) => (weeklyReduction === null ? "—" : formatCompactValue(n).value)}
+          formatValue={(n) => (weeklyReduction === null ? "·" : formatCompactValue(n).value)}
           unit={weeklyReduction !== null ? formatCompactValue(Math.max(0, weeklyReduction)).unit : ""}
           deltaLabel={vsWeek ? `siden ${formatDateShort(vsWeek.fromDate)}` : "Bygger historikk"}
           deltaTone="good"
@@ -89,9 +89,9 @@ export function MovementView() {
         <KpiCard
           label="Jobbet ned (sist)"
           value={vsPrev ? vsPrev.cleared : 0}
-          formatValue={(n) => (vsPrev ? formatCompactValue(n).value : "—")}
+          formatValue={(n) => (vsPrev ? formatCompactValue(n).value : "·")}
           unit={vsPrev ? formatCompactValue(vsPrev.cleared).unit : ""}
-          deltaLabel={vsPrev ? `ny avskrivning ${formatCompactShort(vsPrev.newObsolescence)}` : "—"}
+          deltaLabel={vsPrev ? `ny avskrivning ${formatCompactShort(vsPrev.newObsolescence)}` : "·"}
           deltaTone="good"
         />
       </div>
@@ -104,7 +104,7 @@ export function MovementView() {
             <LineChart data={trend} formatValue={(n) => `${formatNumber(n)} NOK`} color={vsPrev && vsPrev.delta <= 0 ? "#15924C" : "#E5484D"} height={240} />
             <Takeaway>
               {weeklyReduction !== null && weeklyReduction > 0
-                ? `Old stock er redusert med ${formatCompactShort(weeklyReduction)} NOK denne perioden — tiltakene virker.`
+                ? `Old stock er redusert med ${formatCompactShort(weeklyReduction)} NOK denne perioden. Tiltakene virker.`
                 : "Følg kurven daglig for å se om tiltakene gir reduksjon."}
             </Takeaway>
           </>

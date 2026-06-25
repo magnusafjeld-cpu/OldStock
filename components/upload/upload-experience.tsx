@@ -94,7 +94,7 @@ export function UploadExperience() {
           </div>
         </div>
         <p className="mt-s5 text-body text-ink-secondary">
-          Se hva som er — og hva som blir — old stock. Vit hva du skal gjøre.
+          Se hva som er og hva som blir old stock. Vit hva du skal gjøre.
         </p>
       </div>
 
@@ -157,7 +157,7 @@ export function UploadExperience() {
               <UploadCloud size={26} />
             </div>
             <div className="text-h3 text-ink-primary">Dra Excel-eksporten hit</div>
-            <div className="my-s2 text-label text-ink-tertiary">— eller —</div>
+            <div className="my-s2 text-label text-ink-tertiary">eller</div>
             <span className="inline-flex h-[38px] items-center gap-s2 rounded-md bg-brand-green px-s4 text-label font-semibold text-white">
               <FileSpreadsheet size={16} /> Velg fil
             </span>
@@ -174,7 +174,7 @@ export function UploadExperience() {
 
       <div className="mt-s5 flex items-center gap-s2 text-label text-ink-tertiary">
         <ShieldCheck size={15} className="text-brand-green" />
-        Dataene forlater aldri denne maskinen — alt behandles lokalt i nettleseren.
+        Dataene forlater aldri denne maskinen. Alt behandles lokalt i nettleseren.
       </div>
 
       {recentFiles.length > 0 && (

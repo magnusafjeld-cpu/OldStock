@@ -102,7 +102,7 @@ export function FocusView() {
           ))}
         </div>
       ) : (
-        <EmptyState tone="positive" title="Ingen varer matcher filtrene — bra jobba." description="Juster filtrene over, eller last opp etter neste lageruttrekk." />
+        <EmptyState tone="positive" title="Ingen varer matcher filtrene. Bra jobba!" description="Juster filtrene over, eller last opp etter neste lageruttrekk." />
       )}
 
       <ProductDetailSlideOver article={selected} store={scoped.store} onClose={() => setSelected(null)} />

@@ -29,7 +29,7 @@ export function recommendAction(input: RecommendInput): Recommendation {
     return {
       type: "kampanje",
       label: "I kampanje",
-      detail: "Inngår i kommende kampanje — følg med, rydder seg trolig selv.",
+      detail: "Inngår i kommende kampanje. Følg med, rydder seg trolig selv.",
       estImpact: totalChange,
     };
   }
@@ -40,8 +40,8 @@ export function recommendAction(input: RecommendInput): Recommendation {
       label: "Overvåk",
       detail:
         status === "becoming"
-          ? "Begynner å bli old stock — hold under oppsyn ved neste opplasting."
-          : "Lav eksponering — hold på vaktlista.",
+          ? "Begynner å bli old stock. Hold under oppsyn ved neste opplasting."
+          : "Lav eksponering. Hold på vaktlista.",
       estImpact: status === "becoming" ? totalChange : obsoleteNow,
     };
   }
@@ -73,7 +73,7 @@ export function recommendAction(input: RecommendInput): Recommendation {
     type: "prisned",
     label: "Sett ned pris",
     detail: worsening
-      ? `Allerede old stock og øker — prioriter utsalg av ${units} for å frigjøre ~${formatCompactShort(
+      ? `Allerede old stock og øker. Prioriter utsalg av ${units} for å frigjøre ~${formatCompactShort(
           obsoleteNow + totalChange
         )} NOK.`
       : `Sett ned pris / selg ut ${units} for å frigjøre ~${formatCompactShort(obsoleteNow)} NOK bunden kapital.`,

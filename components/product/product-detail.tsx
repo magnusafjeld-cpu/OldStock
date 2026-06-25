@@ -55,7 +55,7 @@ export function ProductDetail({ article, store }: { article: Article; store: str
         {/* money metrics */}
         <div className="grid grid-cols-2 gap-s3">
           <DetailMetric label="Old stock nå (avskrevet)" value={`${formatNumber(article.obsoleteNow)} NOK`} loud color={article.obsoleteNow > 0 ? tierColor : "#14253B"} />
-          <DetailMetric label="Antall på lager" value={article.qty > 0 ? formatNumber(article.qty) : "—"} />
+          <DetailMetric label="Antall på lager" value={formatNumber(article.qty)} />
           <DetailMetric label="Blir old stock (3 mnd)" value={`${article.totalChange > 0 ? "+" : ""}${formatNumber(article.totalChange)} NOK`} color="#E5800B" />
           <DetailMetric label="Estimert effekt ved tiltak" value={`${formatNumber(article.recommendation.estImpact)} NOK`} color="#15924C" />
         </div>
@@ -122,9 +122,9 @@ function explain(a: Article): string {
   if (a.status === "becoming")
     return `Ikke old stock ennå, men ${formatNumber(a.totalChange)} NOK blir avskrevet de neste 3 månedene hvis varen ikke selges.`;
   if (a.status === "both")
-    return `Allerede old stock og øker — ${formatNumber(a.obsoleteNow)} NOK avskrevet nå, +${formatNumber(a.totalChange)} NOK på vei.`;
+    return `Allerede old stock og øker. ${formatNumber(a.obsoleteNow)} NOK avskrevet nå, og +${formatNumber(a.totalChange)} NOK på vei.`;
   if (a.status === "old")
-    return `Allerede old stock — ${formatNumber(a.obsoleteNow)} NOK avskrevet og bundet i lager.`;
+    return `Allerede old stock. ${formatNumber(a.obsoleteNow)} NOK avskrevet og bundet i lager.`;
   return "Ikke old stock og ingen avskrivning ventet.";
 }
 

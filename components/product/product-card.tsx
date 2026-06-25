@@ -67,8 +67,8 @@ export function ProductCard({
           {/* metrics */}
           <div className="mt-s3 grid grid-cols-4 gap-s3 border-t border-hairline-subtle pt-s3">
             <Metric label="Old stock nå" value={formatCompactShort(article.obsoleteNow)} loud tone={article.obsoleteNow > 0 ? "bad" : "neutral"} />
-            <Metric label="Blir old stock" value={article.totalChange > 0 ? `+${formatCompactShort(article.totalChange)}` : "—"} tone={article.totalChange > 0 ? "warn" : "neutral"} />
-            <Metric label="Antall" value={article.qty > 0 ? formatNumber(article.qty) : "—"} />
+            <Metric label="Blir old stock" value={article.totalChange > 0 ? `+${formatCompactShort(article.totalChange)}` : "0"} tone={article.totalChange > 0 ? "warn" : "neutral"} />
+            <Metric label="Antall" value={formatNumber(article.qty)} />
             <Metric label="Prognose 3 mnd" value={formatCompactShort(article.forecast3m)} />
           </div>
 
