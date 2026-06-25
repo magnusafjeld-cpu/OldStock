@@ -12,6 +12,7 @@ import {
   PanelLeftOpen,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { ElkjopWing } from "@/components/ui/elkjop-logo";
 
 const NAV = [
   { href: "/dashboard", label: "Oversikt", icon: Gauge },
@@ -48,9 +49,7 @@ export function NavRail() {
     >
       {/* brand */}
       <div className={cn("flex items-center gap-s3 px-s4 py-s5", collapsed && "justify-center px-0")}>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-brand-green">
-          <span className="font-sans text-[20px] font-extrabold text-white">E</span>
-        </div>
+        <ElkjopWing className="h-8 w-8 shrink-0" />
         {!collapsed && (
           <div className="min-w-0">
             <div className="truncate text-h3 leading-tight text-white">Old Stock</div>

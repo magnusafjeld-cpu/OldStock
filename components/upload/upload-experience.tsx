@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { ParseError } from "@/lib/parse/xlsx";
+import { ElkjopWing } from "@/components/ui/elkjop-logo";
 import { formatCompactShort, formatRelativeTime } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
@@ -85,9 +86,7 @@ export function UploadExperience() {
       {/* brand lockup */}
       <div className="mb-s10 flex flex-col items-center text-center">
         <div className="flex items-center gap-s3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-brand-green">
-            <span className="text-[24px] font-extrabold text-white">E</span>
-          </div>
+          <ElkjopWing className="h-11 w-11 shrink-0" />
           <div className="text-left">
             <div className="text-h2 leading-none text-ink-primary">Old Stock Cockpit</div>
             <div className="overline mt-1">Elkjøp · Old stock-oversikt</div>
