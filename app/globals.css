@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body {
+    background-color: #f4f6f9;
+    color: #14253b;
+  }
+
+  body {
+    font-feature-settings: "tnum" 0;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Tabular figures are mandatory on every metric (per spec). */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  ::selection {
+    background: rgba(14, 140, 67, 0.18);
+  }
+
+  /* Custom scrollbars to keep the light canvas cohesive. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #c5cdd9 transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: #c5cdd9;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: #aeb8c6;
+    background-clip: content-box;
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(46, 111, 242, 0.45);
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  /* Skeleton shimmer — left-to-right sweep at 1.4s (spec §11). */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: #e7ebf1;
+    border-radius: 8px;
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.85),
+      transparent
+    );
+    animation: shimmer 1.4s infinite;
+  }
+
+  /* The mono overline label used across cards and tables. */
+  .overline {
+    font-family: var(--font-jetbrains), ui-monospace, monospace;
+    font-size: 11px;
+    line-height: 1.2;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #8a98ac;
+  }
+
+  /* Subtle dotted grid backdrop used on the upload canvas. */
+  .dot-grid {
+    background-image: radial-gradient(rgba(16, 40, 70, 0.06) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+}
+
+@layer utilities {
+  .animate-shimmer {
+    animation: shimmer 1.4s infinite;
+  }
+}
