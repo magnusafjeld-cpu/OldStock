@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import type { Article } from "@/types/domain";
 import { ProductThumb } from "./product-thumb";
 import { RiskBadgeSolid, StatusChip, WorkflowChip, Tag } from "@/components/ui/badges";
+import { CopyCode } from "@/components/ui/copy-code";
 import { Button } from "@/components/ui/button";
 import { formatCompactShort, formatNumber } from "@/lib/format";
 import { CATEGORY_LABEL } from "@/lib/ui-tokens";
@@ -45,6 +46,11 @@ export function ProductCard({
           <div className="flex items-start justify-between gap-s3">
             <div className="min-w-0">
               <div className="truncate text-h3 text-ink-primary">{article.article}</div>
+              {article.articleCode && (
+                <div className="mt-1">
+                  <CopyCode code={article.articleCode} />
+                </div>
+              )}
               <div className="mt-1 flex flex-wrap items-center gap-x-s2 gap-y-1 text-label text-ink-tertiary">
                 <span>{CATEGORY_LABEL[article.category]}</span>
                 <span>·</span>

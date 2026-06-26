@@ -3,6 +3,7 @@
 import type { Article } from "@/types/domain";
 import { ProductThumb } from "./product-thumb";
 import { RiskChip, StatusChip, WorkflowChip, Tag } from "@/components/ui/badges";
+import { CopyCode } from "@/components/ui/copy-code";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/bars";
 import { Sparkline } from "@/components/charts/sparkline";
@@ -37,6 +38,11 @@ export function ProductDetail({ article, store }: { article: Article; store: str
               <WorkflowChip status={status} />
             </div>
             <h2 className="mt-s2 text-h2 leading-tight text-ink-primary">{article.article}</h2>
+            {article.articleCode && (
+              <div className="mt-s2">
+                <CopyCode code={article.articleCode} />
+              </div>
+            )}
             <div className="mt-s2 flex flex-wrap items-center gap-x-s2 gap-y-1 text-label text-ink-tertiary">
               <span className="inline-flex items-center gap-1" style={{ color: CATEGORY_COLOR[article.category] }}>
                 ● {CATEGORY_LABEL[article.category]}

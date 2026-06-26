@@ -13,6 +13,7 @@ export interface ParseResult {
 export class ParseError extends Error {}
 
 interface ColumnTargets {
+  articleCode: number;
   article: number;
   qty: number;
   obsoleteNow: number;
@@ -44,7 +45,8 @@ function toNumberOrNull(v: unknown): number | null {
 }
 
 const HEADER_MATCHERS: Record<keyof ColumnTargets, (h: string) => boolean> = {
-  article: (h) => h === "article" || h.includes("article") || h.includes("drill"),
+  articleCode: (h) => h.includes("article") && (h.includes("code") || h.includes("kode")),
+  article: (h) => h === "article" || (h.includes("article") && !h.includes("code") && !h.includes("kode")),
   qty: (h) => h.includes("qty") || (h.includes("stock") && h.includes("yesterday")),
   obsoleteNow: (h) =>
     h.includes("value obsolete") || (h.includes("obsolete") && h.includes("yesterday")),
@@ -96,7 +98,7 @@ function parseFooter(matrix: unknown[][]): {
   };
 }
 
-const TRUTHY_CAMPAIGN = /^(ja|yes|true|y|x|1|kampanje)/i;
+const FALSY_CAMPAIGN = /^(nei|no|none|false|0|-)$/i;
 
 export async function parseWorkbook(file: File): Promise<ParseResult> {
   const buffer = await file.arrayBuffer();
@@ -137,6 +139,8 @@ export async function parseWorkbook(file: File): Promise<ParseResult> {
 
     const at = (idx: number) => (idx >= 0 ? toNumber(r?.[idx]) : 0);
     const obsoleteNow = at(col.obsoleteNow);
+    const articleCode =
+      col.articleCode >= 0 ? String(r?.[col.articleCode] ?? "").trim() : "";
 
     // Forecasts carry forward when a cell is blank (no further obsolescence).
     const f1raw = col.forecast1m >= 0 ? toNumberOrNull(r?.[col.forecast1m]) : null;
@@ -146,12 +150,15 @@ export async function parseWorkbook(file: File): Promise<ParseResult> {
     const forecast2m = f2raw ?? forecast1m;
     const forecast3m = f3raw ?? forecast2m;
 
-    const campaignCell = col.campaign >= 0 ? r?.[col.campaign] : null;
-    const inCampaign =
-      campaignCell != null && TRUTHY_CAMPAIGN.test(String(campaignCell).trim());
+    // "In Future Campaign" carries either a flag or a campaign code — any
+    // non-empty, non-negative value means the article is in a campaign.
+    const campaignStr =
+      col.campaign >= 0 ? String(r?.[col.campaign] ?? "").trim() : "";
+    const inCampaign = campaignStr !== "" && !FALSY_CAMPAIGN.test(campaignStr);
 
     rows.push({
       article: name,
+      articleCode,
       qty: at(col.qty),
       obsoleteNow,
       forecast1m,

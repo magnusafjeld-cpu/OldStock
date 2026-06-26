@@ -29,6 +29,7 @@ export type StockStatus = "old" | "becoming" | "both" | "healthy";
 /** A single row exactly as parsed from the spreadsheet (cleaned). */
 export interface RawArticleRow {
   article: string;
+  articleCode: string;
   qty: number;
   obsoleteNow: number; // Value Obsolete Yesterday
   change1m: number; // yesterday → +1 mnd

@@ -4,6 +4,7 @@ import { STATUS_LABEL, TIER_LABEL } from "@/lib/ui-tokens";
 /** Serialize analyzed articles to CSV and trigger a local download. */
 export function exportArticlesToCsv(articles: Article[], fileName: string): void {
   const headers = [
+    "Artikkelkode",
     "Artikkel",
     "Kategori",
     "Merke",
@@ -28,6 +29,7 @@ export function exportArticlesToCsv(articles: Article[], fileName: string): void
 
   const lines = articles.map((a) =>
     [
+      a.articleCode,
       a.article,
       a.category,
       a.brand,

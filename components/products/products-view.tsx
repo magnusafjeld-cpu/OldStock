@@ -10,6 +10,7 @@ import { Segmented } from "@/components/ui/segmented";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusChip, ScoreBadge } from "@/components/ui/badges";
+import { CopyCode } from "@/components/ui/copy-code";
 import { ProductThumb } from "@/components/product/product-thumb";
 import { ProductDetailSlideOver } from "@/components/product/product-detail-slideover";
 import { formatCompactShort, formatNumber } from "@/lib/format";
@@ -48,7 +49,10 @@ export function ProductsView() {
             <ProductThumb category={a.category} size={36} />
             <div className="min-w-0">
               <div className="truncate font-medium text-ink-primary">{a.article}</div>
-              <div className="text-[11px] text-ink-tertiary">{CATEGORY_LABEL[a.category]} · {a.brand}</div>
+              <div className="mt-[3px] flex items-center gap-s2">
+                {a.articleCode && <CopyCode code={a.articleCode} size="xs" />}
+                <span className="text-[11px] text-ink-tertiary">{CATEGORY_LABEL[a.category]} · {a.brand}</span>
+              </div>
             </div>
           </div>
         ),

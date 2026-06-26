@@ -16,8 +16,10 @@ import { recommendAction } from "./recommend";
 
 const CATEGORIES: ProductCategory[] = ["Smartphone", "Tablet", "Smartwatch", "Other"];
 
-function stableKey(name: string): string {
-  return name.toLowerCase().replace(/\s+/g, " ").trim();
+function stableKey(row: RawArticleRow): string {
+  // Article code is stable across days; fall back to the name when absent.
+  if (row.articleCode) return `code:${row.articleCode}`;
+  return `name:${row.article.toLowerCase().replace(/\s+/g, " ").trim()}`;
 }
 
 function slugify(name: string, index: number): string {
@@ -60,7 +62,7 @@ function analyzeRow(row: RawArticleRow, index: number, datasetMax: number): Arti
   return {
     ...row,
     id: slugify(row.article, index),
-    key: stableKey(row.article),
+    key: stableKey(row),
     category,
     brand,
     flags,
