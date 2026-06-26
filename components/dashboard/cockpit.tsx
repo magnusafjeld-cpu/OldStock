@@ -6,8 +6,8 @@ import { ArrowRight } from "lucide-react";
 import { useScoped } from "@/lib/use-scoped";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { computeAggregates } from "@/lib/analytics/analyze";
-import { filterByScope } from "@/lib/analytics/filter";
-import type { Article, ProductCategory } from "@/types/domain";
+import { filterByDepartments } from "@/lib/analytics/filter";
+import type { Article } from "@/types/domain";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { Card } from "@/components/ui/card";
 import { SectionHeader, Takeaway } from "@/components/ui/section";
@@ -19,42 +19,41 @@ import { ProductDetailSlideOver } from "@/components/product/product-detail-slid
 import { ProgressBar } from "@/components/ui/bars";
 import { formatCompactValue, formatCompactShort, formatNumber, formatPct } from "@/lib/format";
 import {
-  CATEGORY_COLOR,
-  CATEGORY_LABEL,
   SPLIT_BECOMING_COLOR,
   SPLIT_OLD_COLOR,
+  departmentColor,
+  departmentLabel,
 } from "@/lib/ui-tokens";
-
-const CATS: ProductCategory[] = ["Smartphone", "Tablet", "Smartwatch", "Other"];
 
 export function Cockpit() {
   const scoped = useScoped();
-  const { activeHistory, previousSnapshot, categoryScope } = useWorkspace();
+  const { activeHistory, previousSnapshot, hiddenDepartments } = useWorkspace();
   const [selected, setSelected] = useState<Article | null>(null);
 
   // Day-over-day movement of obsolete value (scoped, vs previous snapshot).
   const prevObsolete = useMemo(() => {
     if (!previousSnapshot) return null;
-    return computeAggregates(filterByScope(previousSnapshot.articles, categoryScope)).obsoleteNow;
-  }, [previousSnapshot, categoryScope]);
+    return computeAggregates(filterByDepartments(previousSnapshot.articles, hiddenDepartments)).obsoleteNow;
+  }, [previousSnapshot, hiddenDepartments]);
 
   // History line of obsolete value over snapshot dates (scoped).
   const trend = useMemo(
     () =>
       activeHistory.map((s) => ({
         label: s.date.slice(5),
-        value: computeAggregates(filterByScope(s.articles, categoryScope)).obsoleteNow,
+        value: computeAggregates(filterByDepartments(s.articles, hiddenDepartments)).obsoleteNow,
       })),
-    [activeHistory, categoryScope]
+    [activeHistory, hiddenDepartments]
   );
 
   const queue = useMemo(() => (scoped ? scoped.focus.slice(0, 6) : []), [scoped]);
 
-  const categoryRows = useMemo(() => {
+  const departmentRows = useMemo(() => {
     if (!scoped) return [];
-    return CATS.map((c) => scoped.aggregates.byCategory[c]).filter(
-      (r) => r.obsoleteNow > 0 || r.becoming > 0
-    );
+    return Object.values(scoped.aggregates.byDepartment)
+      .filter((r) => r.obsoleteNow > 0 || r.becoming > 0)
+      .sort((a, b) => b.obsoleteNow + b.becoming - (a.obsoleteNow + a.becoming))
+      .slice(0, 8);
   }, [scoped]);
 
   if (!scoped) return null;
@@ -187,28 +186,30 @@ export function Cockpit() {
         </Card>
 
         <Card className="p-s6">
-          <SectionHeader overline="Kategori" title="Hvor ligger risikoen" />
+          <SectionHeader overline="Avdeling" title="Hvor ligger risikoen" />
           <div className="space-y-s4">
-            {categoryRows.map((r) => {
+            {departmentRows.map((r) => {
               const total = r.obsoleteNow + r.becoming;
-              const pct = splitTotal > 0 ? (total / (agg.obsoleteNow + agg.becoming)) * 100 : 0;
+              const denom = agg.obsoleteNow + agg.becoming;
+              const pct = denom > 0 ? (total / denom) * 100 : 0;
+              const color = departmentColor(r.department);
               return (
-                <div key={r.category}>
+                <div key={r.department}>
                   <div className="mb-1 flex items-center justify-between text-label">
                     <span className="flex items-center gap-s2 text-ink-secondary">
-                      <span className="h-[10px] w-[10px] rounded-[3px]" style={{ backgroundColor: CATEGORY_COLOR[r.category] }} />
-                      {CATEGORY_LABEL[r.category]}
+                      <span className="h-[10px] w-[10px] rounded-[3px]" style={{ backgroundColor: color }} />
+                      {departmentLabel(r.department)}
                     </span>
                     <span className="tnum text-ink-primary">{formatCompactShort(total)} NOK</span>
                   </div>
-                  <ProgressBar value={pct} color={CATEGORY_COLOR[r.category]} />
+                  <ProgressBar value={pct} color={color} />
                   <div className="tnum mt-1 text-[11px] text-ink-tertiary">
                     {formatCompactShort(r.obsoleteNow)} nå · +{formatCompactShort(r.becoming)} på vei · {r.skuCount} varer
                   </div>
                 </div>
               );
             })}
-            {categoryRows.length === 0 && <EmptyState tone="positive" title="Ingen old stock" />}
+            {departmentRows.length === 0 && <EmptyState tone="positive" title="Ingen old stock" />}
           </div>
         </Card>
       </section>

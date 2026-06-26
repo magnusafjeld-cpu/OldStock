@@ -16,12 +16,18 @@ export async function buildSnapshotFromFile(file: File, date = today()): Promise
   const articles = analyzeRows(parsed.rows);
   const aggregates = computeAggregates(articles);
 
+  // Distinct departments, ordered by obsolete exposure (largest first).
+  const departments = Object.values(aggregates.byDepartment)
+    .sort((a, b) => b.obsoleteNow + b.becoming - (a.obsoleteNow + a.becoming))
+    .map((d) => d.department);
+
   return {
     id: `${parsed.store}__${date}`,
     store: parsed.store,
     chain: parsed.chain,
     currency: parsed.currency,
     articleCategory: parsed.articleCategory,
+    departments,
     fileName: file.name,
     date,
     uploadedAt: Date.now(),

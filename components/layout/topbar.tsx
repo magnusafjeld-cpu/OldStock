@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Search, UploadCloud } from "lucide-react";
 import { StoreSelector } from "./store-selector";
-import { ScopeFilter } from "./scope-filter";
+import { DepartmentFilter } from "./department-filter";
 
 /**
  * Page chrome: title + subtitle on the left, then store selector, the global
@@ -32,7 +32,7 @@ export function Topbar({
         </div>
 
         <div className="flex flex-wrap items-center gap-s3">
-          {showScope && <ScopeFilter />}
+          {showScope && <DepartmentFilter />}
 
           <form
             onSubmit={(e) => {

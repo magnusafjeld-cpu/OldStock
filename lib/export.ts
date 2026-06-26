@@ -6,6 +6,7 @@ export function exportArticlesToCsv(articles: Article[], fileName: string): void
   const headers = [
     "Artikkelkode",
     "Artikkel",
+    "Avdeling",
     "Kategori",
     "Merke",
     "Status",
@@ -31,6 +32,7 @@ export function exportArticlesToCsv(articles: Article[], fileName: string): void
     [
       a.articleCode,
       a.article,
+      a.department,
       a.category,
       a.brand,
       STATUS_LABEL[a.status],

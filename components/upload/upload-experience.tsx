@@ -9,6 +9,8 @@ import {
   ArrowRight,
   AlertTriangle,
   Loader2,
+  BarChart3,
+  ExternalLink,
 } from "lucide-react";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { ParseError } from "@/lib/parse/xlsx";
@@ -17,6 +19,9 @@ import { formatCompactShort, formatRelativeTime } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
 type Phase = "idle" | "dragover" | "parsing" | "success" | "error";
+
+const POWERBI_URL =
+  "https://app.powerbi.com/groups/me/apps/fbf0c9b5-be68-43c9-9502-58461f9eac6c/reports/ca8f5d5c-d7d1-49fe-8d5f-56f6c275a404/ReportSection?ctid=661f8f5f-1e7d-4d4d-a886-1d2661c4ddf8&experience=power-bi";
 
 const PARSE_STEPS = [
   "Leser arbeidsbok…",
@@ -175,6 +180,17 @@ export function UploadExperience() {
         <ShieldCheck size={15} className="text-brand-green" />
         Dataene forlater aldri denne maskinen. Alt behandles lokalt i nettleseren.
       </div>
+
+      <a
+        href={POWERBI_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-s5 inline-flex items-center gap-s2 rounded-md border border-hairline bg-surface-1 px-s4 py-s2 text-label font-medium text-ink-secondary transition-colors hover:border-hairline-strong hover:text-ink-primary"
+      >
+        <BarChart3 size={16} className="text-brand-blue" />
+        Åpne full rapport i Power BI
+        <ExternalLink size={14} className="text-ink-tertiary" />
+      </a>
 
       {recentFiles.length > 0 && (
         <div className="mt-s10 w-full max-w-[520px]">

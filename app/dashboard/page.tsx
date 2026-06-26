@@ -12,7 +12,7 @@ export default function DashboardPage() {
       title="Oversikt"
       subtitle={
         activeSnapshot
-          ? `${activeSnapshot.store} · ${activeSnapshot.articleCategory} · ${formatDateLong(activeSnapshot.date)}`
+          ? `${activeSnapshot.store} · ${activeSnapshot.departments.length} avdelinger · ${formatDateLong(activeSnapshot.date)}`
           : undefined
       }
     >

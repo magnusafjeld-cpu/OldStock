@@ -15,6 +15,7 @@ export class ParseError extends Error {}
 interface ColumnTargets {
   articleCode: number;
   article: number;
+  department: number;
   qty: number;
   obsoleteNow: number;
   forecast1m: number;
@@ -47,6 +48,7 @@ function toNumberOrNull(v: unknown): number | null {
 const HEADER_MATCHERS: Record<keyof ColumnTargets, (h: string) => boolean> = {
   articleCode: (h) => h.includes("article") && (h.includes("code") || h.includes("kode")),
   article: (h) => h === "article" || (h.includes("article") && !h.includes("code") && !h.includes("kode")),
+  department: (h) => h === "category" || h === "department" || h === "avdeling",
   qty: (h) => h.includes("qty") || (h.includes("stock") && h.includes("yesterday")),
   obsoleteNow: (h) =>
     h.includes("value obsolete") || (h.includes("obsolete") && h.includes("yesterday")),
@@ -141,6 +143,10 @@ export async function parseWorkbook(file: File): Promise<ParseResult> {
     const obsoleteNow = at(col.obsoleteNow);
     const articleCode =
       col.articleCode >= 0 ? String(r?.[col.articleCode] ?? "").trim() : "";
+    const department =
+      (col.department >= 0 ? String(r?.[col.department] ?? "").trim() : "") ||
+      meta.articleCategory ||
+      "Ukjent";
 
     // Forecasts carry forward when a cell is blank (no further obsolescence).
     const f1raw = col.forecast1m >= 0 ? toNumberOrNull(r?.[col.forecast1m]) : null;
@@ -159,6 +165,7 @@ export async function parseWorkbook(file: File): Promise<ParseResult> {
     rows.push({
       article: name,
       articleCode,
+      department,
       qty: at(col.qty),
       obsoleteNow,
       forecast1m,
@@ -176,14 +183,12 @@ export async function parseWorkbook(file: File): Promise<ParseResult> {
 
   return {
     rows,
-    store: meta.store || deriveStoreFromFileName(file.name),
+    // The footer carries a Store Name only for single-store exports; chain-wide
+    // exports (all departments) have none, so fall back to the chain label.
+    store: meta.store || "Elkjøp",
     chain: meta.chain,
     currency: meta.currency,
     articleCategory: meta.articleCategory,
     rowCount: rows.length,
   };
-}
-
-function deriveStoreFromFileName(fileName: string): string {
-  return fileName.replace(/\.(xlsx|xls|csv)$/i, "").replace(/[_-]+/g, " ").trim() || "Ukjent butikk";
 }

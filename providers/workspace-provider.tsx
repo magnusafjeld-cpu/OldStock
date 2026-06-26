@@ -8,12 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import type {
-  CategoryScope,
-  RecentFileMeta,
-  Snapshot,
-  WorkflowStatus,
-} from "@/types/domain";
+import type { RecentFileMeta, Snapshot, WorkflowStatus } from "@/types/domain";
 import { buildSnapshotFromFile } from "@/lib/analytics/dataset";
 import {
   clearAllSnapshots,
@@ -39,19 +34,25 @@ interface WorkspaceContextValue {
   previousSnapshot: Snapshot | null;
   weeklySnapshot: Snapshot | null;
   recentFiles: RecentFileMeta[];
-  categoryScope: CategoryScope;
+  /** Departments available in the active snapshot (largest exposure first). */
+  departments: string[];
+  /** Departments currently hidden from view (empty = show all). */
+  hiddenDepartments: string[];
 
   importFile: (file: File) => Promise<Snapshot>;
   setActiveStore: (store: string) => void;
   removeSnapshot: (id: string) => Promise<void>;
   clearWorkspace: () => Promise<void>;
-  setCategoryScope: (scope: CategoryScope) => void;
+  toggleDepartment: (dept: string) => void;
+  showAllDepartments: () => void;
 
   getWorkflow: (store: string, articleKey: string) => WorkflowStatus;
   setWorkflow: (store: string, articleKey: string, status: WorkflowStatus) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
+
+const HIDDEN_DEPTS_KEY = "elkjop-hidden-departments";
 
 function daysBetween(aDate: string, bDate: string): number {
   return Math.round((Date.parse(bDate) - Date.parse(aDate)) / 86_400_000);
@@ -61,7 +62,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [activeStore, setActiveStoreState] = useState<string | null>(null);
-  const [categoryScope, setCategoryScope] = useState<CategoryScope>("all");
+  const [hiddenDepartments, setHiddenDepartments] = useState<string[]>([]);
   const [workflowMap, setWorkflowMap] = useState<WorkflowMap>({});
 
   useEffect(() => {
@@ -72,12 +73,42 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       setSnapshots(stored);
       setActiveStoreState(stored[stored.length - 1]?.store ?? null);
       setWorkflowMap(loadWorkflowMap());
+      try {
+        setHiddenDepartments(JSON.parse(localStorage.getItem(HIDDEN_DEPTS_KEY) || "[]"));
+      } catch {
+        /* ignore */
+      }
       setHydrated(true);
     })();
     return () => {
       alive = false;
     };
   }, []);
+
+  const persistHidden = useCallback((next: string[]) => {
+    setHiddenDepartments(next);
+    try {
+      localStorage.setItem(HIDDEN_DEPTS_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore quota */
+    }
+  }, []);
+
+  const toggleDepartment = useCallback(
+    (dept: string) =>
+      setHiddenDepartments((prev) => {
+        const next = prev.includes(dept) ? prev.filter((d) => d !== dept) : [...prev, dept];
+        try {
+          localStorage.setItem(HIDDEN_DEPTS_KEY, JSON.stringify(next));
+        } catch {
+          /* ignore */
+        }
+        return next;
+      }),
+    []
+  );
+
+  const showAllDepartments = useCallback(() => persistHidden([]), [persistHidden]);
 
   const importFile = useCallback(async (file: File) => {
     const snapshot = await buildSnapshotFromFile(file);
@@ -149,6 +180,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     return (target[target.length - 1] ?? prior[0]) ?? null;
   }, [activeHistory, activeSnapshot]);
 
+  const departments = useMemo(() => activeSnapshot?.departments ?? [], [activeSnapshot]);
+
   const recentFiles = useMemo<RecentFileMeta[]>(
     () =>
       [...snapshots]
@@ -174,12 +207,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     previousSnapshot,
     weeklySnapshot,
     recentFiles,
-    categoryScope,
+    departments,
+    hiddenDepartments,
     importFile,
     setActiveStore,
     removeSnapshot,
     clearWorkspace,
-    setCategoryScope,
+    toggleDepartment,
+    showAllDepartments,
     getWorkflow,
     setWorkflow,
   };

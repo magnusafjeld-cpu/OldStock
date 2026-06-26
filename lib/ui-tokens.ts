@@ -58,3 +58,33 @@ export const STATUS_COLOR: Record<StockStatus, string> = {
 /** The two headline buckets used in the status split. */
 export const SPLIT_OLD_COLOR = "#E5484D"; // er old stock (avskrevet verdi nå)
 export const SPLIT_BECOMING_COLOR = "#E5800B"; // blir old stock (kommende avskrivning)
+
+/** Short labels for Elkjøp departments shown on each unit. */
+export const DEPARTMENT_ABBR: Record<string, string> = {
+  "Consumer Electronics": "CE",
+  "Kitchen & Interior": "K&I",
+};
+
+export function departmentLabel(dept: string): string {
+  return DEPARTMENT_ABBR[dept] ?? dept;
+}
+
+const DEPARTMENT_COLORS: Record<string, string> = {
+  Telecom: "#3B7DF5",
+  Computing: "#7C5CFF",
+  MDA: "#0EA09A",
+  SDA: "#E0A21E",
+  "Consumer Electronics": "#DB2777",
+  "Kitchen & Interior": "#65A30D",
+  Other: "#8A98AC",
+  Unknown: "#B4BECB",
+};
+
+const FALLBACK_DEPARTMENT_COLORS = ["#3B7DF5", "#7C5CFF", "#0EA09A", "#E0A21E", "#DB2777", "#65A30D"];
+
+export function departmentColor(dept: string): string {
+  if (DEPARTMENT_COLORS[dept]) return DEPARTMENT_COLORS[dept];
+  let hash = 0;
+  for (let i = 0; i < dept.length; i++) hash = (hash * 31 + dept.charCodeAt(i)) >>> 0;
+  return FALLBACK_DEPARTMENT_COLORS[hash % FALLBACK_DEPARTMENT_COLORS.length];
+}

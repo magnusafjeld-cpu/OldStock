@@ -18,6 +18,8 @@ import { exportArticlesToCsv } from "@/lib/export";
 type StatusFilter = "all" | "old" | "becoming";
 type FlowFilter = "all" | WorkflowStatus;
 
+const MAX_CARDS = 60;
+
 export function FocusView() {
   const scoped = useScoped();
   const { getWorkflow } = useWorkspace();
@@ -93,11 +95,21 @@ export function FocusView() {
         </Button>
       </div>
 
-      <SectionHeader overline="Fokuskø" title={`${filtered.length} ${filtered.length === 1 ? "vare" : "varer"}`} />
+      <SectionHeader
+        overline="Fokuskø"
+        title={`${filtered.length} ${filtered.length === 1 ? "vare" : "varer"}`}
+        action={
+          filtered.length > MAX_CARDS ? (
+            <span className="text-label text-ink-tertiary">
+              Viser de {MAX_CARDS} høyest prioriterte
+            </span>
+          ) : undefined
+        }
+      />
 
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 gap-s4 2xl:grid-cols-2">
-          {filtered.map((a) => (
+          {filtered.slice(0, MAX_CARDS).map((a) => (
             <ProductCard key={a.id} article={a} store={scoped.store} onOpen={setSelected} />
           ))}
         </div>

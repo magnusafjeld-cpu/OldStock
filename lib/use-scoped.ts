@@ -3,14 +3,14 @@
 import { useMemo } from "react";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { computeAggregates } from "@/lib/analytics/analyze";
-import { filterByScope, focusArticles } from "@/lib/analytics/filter";
+import { filterByDepartments, focusArticles } from "@/lib/analytics/filter";
 import type { Aggregates, Article, Snapshot } from "@/types/domain";
 
 export interface ScopedData {
   store: string;
   date: string;
   snapshot: Snapshot;
-  /** All articles within the active category scope. */
+  /** Articles within the selected departments. */
   articles: Article[];
   /** Articles in play (old or becoming), sorted by focus score. */
   focus: Article[];
@@ -18,13 +18,13 @@ export interface ScopedData {
   aggregates: Aggregates;
 }
 
-/** The active snapshot's articles filtered by the global category scope. */
+/** The active snapshot's articles filtered by the selected departments. */
 export function useScoped(): ScopedData | null {
-  const { activeSnapshot, categoryScope } = useWorkspace();
+  const { activeSnapshot, hiddenDepartments } = useWorkspace();
 
   return useMemo(() => {
     if (!activeSnapshot) return null;
-    const articles = filterByScope(activeSnapshot.articles, categoryScope);
+    const articles = filterByDepartments(activeSnapshot.articles, hiddenDepartments);
     return {
       store: activeSnapshot.store,
       date: activeSnapshot.date,
@@ -33,5 +33,5 @@ export function useScoped(): ScopedData | null {
       focus: focusArticles(articles),
       aggregates: computeAggregates(articles),
     };
-  }, [activeSnapshot, categoryScope]);
+  }, [activeSnapshot, hiddenDepartments]);
 }

@@ -2,13 +2,13 @@
 
 import type { Article } from "@/types/domain";
 import { ProductThumb } from "./product-thumb";
-import { RiskChip, StatusChip, WorkflowChip, Tag } from "@/components/ui/badges";
+import { RiskChip, StatusChip, WorkflowChip, Tag, DepartmentTag } from "@/components/ui/badges";
 import { CopyCode } from "@/components/ui/copy-code";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/bars";
 import { Sparkline } from "@/components/charts/sparkline";
 import { formatNumber } from "@/lib/format";
-import { CATEGORY_COLOR, CATEGORY_LABEL, TIER_COLOR } from "@/lib/ui-tokens";
+import { TIER_COLOR } from "@/lib/ui-tokens";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/components/ui/toast";
 
@@ -44,11 +44,8 @@ export function ProductDetail({ article, store }: { article: Article; store: str
               </div>
             )}
             <div className="mt-s2 flex flex-wrap items-center gap-x-s2 gap-y-1 text-label text-ink-tertiary">
-              <span className="inline-flex items-center gap-1" style={{ color: CATEGORY_COLOR[article.category] }}>
-                ● {CATEGORY_LABEL[article.category]}
-              </span>
-              <span>·</span>
-              <span>{article.brand}</span>
+              <DepartmentTag department={article.department} />
+              {article.brand !== "Other" && <span>{article.brand}</span>}
               {article.inCampaign && <Tag tone="info">I kampanje</Tag>}
               {article.flags.demo && <Tag>Demo</Tag>}
               {article.flags.used && <Tag>Brukt</Tag>}

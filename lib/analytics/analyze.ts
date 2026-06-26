@@ -2,6 +2,7 @@ import type {
   Aggregates,
   Article,
   CategorySlice,
+  DepartmentSlice,
   ProductCategory,
   RawArticleRow,
 } from "@/types/domain";
@@ -119,6 +120,17 @@ export function computeAggregates(articles: Article[]): Aggregates {
   let watchCount = 0;
   let healthyCount = 0;
 
+  const byDepartment: Record<string, DepartmentSlice> = {};
+  const deptOf = (name: string): DepartmentSlice =>
+    (byDepartment[name] ??= {
+      department: name,
+      obsoleteNow: 0,
+      becoming: 0,
+      qty: 0,
+      skuCount: 0,
+      criticalCount: 0,
+    });
+
   for (const a of articles) {
     obsoleteNow += a.obsoleteNow;
     qtyOnStock += a.qty;
@@ -133,6 +145,13 @@ export function computeAggregates(articles: Article[]): Aggregates {
     if (a.totalChange > 0) slice.becoming += a.totalChange;
     slice.qty += a.qty;
     if (a.isOld || a.isBecoming) slice.skuCount += 1;
+
+    const dslice = deptOf(a.department || "Ukjent");
+    dslice.obsoleteNow += a.obsoleteNow;
+    if (a.totalChange > 0) dslice.becoming += a.totalChange;
+    dslice.qty += a.qty;
+    if (a.isOld || a.isBecoming) dslice.skuCount += 1;
+    if (a.riskTier === "Critical") dslice.criticalCount += 1;
 
     if (a.status === "both") bothSkuCount += 1;
     if (a.isOld) oldSkuCount += 1;
@@ -173,5 +192,6 @@ export function computeAggregates(articles: Article[]): Aggregates {
     watchCount,
     healthyCount,
     byCategory,
+    byDepartment,
   };
 }

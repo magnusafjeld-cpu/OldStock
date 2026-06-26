@@ -3,11 +3,10 @@
 import { ArrowRight } from "lucide-react";
 import type { Article } from "@/types/domain";
 import { ProductThumb } from "./product-thumb";
-import { RiskBadgeSolid, StatusChip, WorkflowChip, Tag } from "@/components/ui/badges";
+import { RiskBadgeSolid, StatusChip, WorkflowChip, Tag, DepartmentTag } from "@/components/ui/badges";
 import { CopyCode } from "@/components/ui/copy-code";
 import { Button } from "@/components/ui/button";
 import { formatCompactShort, formatNumber } from "@/lib/format";
-import { CATEGORY_LABEL } from "@/lib/ui-tokens";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/components/ui/toast";
 
@@ -52,9 +51,8 @@ export function ProductCard({
                 </div>
               )}
               <div className="mt-1 flex flex-wrap items-center gap-x-s2 gap-y-1 text-label text-ink-tertiary">
-                <span>{CATEGORY_LABEL[article.category]}</span>
-                <span>·</span>
-                <span>{article.brand}</span>
+                <DepartmentTag department={article.department} />
+                {article.brand !== "Other" && <span>{article.brand}</span>}
                 {article.inCampaign && <Tag tone="info">Kampanje</Tag>}
                 {article.flags.demo && <Tag>Demo</Tag>}
                 {article.flags.used && <Tag>Brukt</Tag>}

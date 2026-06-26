@@ -6,6 +6,8 @@ import {
   TIER_LABEL,
   STATUS_COLOR,
   STATUS_LABEL,
+  departmentColor,
+  departmentLabel,
 } from "@/lib/ui-tokens";
 
 const WORKFLOW_LABEL: Record<WorkflowStatus, string> = {
@@ -148,6 +150,30 @@ export function StatusChip({
     >
       <span className="h-[6px] w-[6px] rounded-full" style={{ backgroundColor: color }} />
       {STATUS_LABEL[status]}
+    </span>
+  );
+}
+
+/** Department badge — colour dot + short label (Telecom, CE, MDA …). */
+export function DepartmentTag({
+  department,
+  className,
+}: {
+  department: string;
+  className?: string;
+}) {
+  if (!department) return null;
+  const color = departmentColor(department);
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-[5px] rounded-md border px-[7px] py-[2px] text-[11px] font-medium",
+        className
+      )}
+      style={{ color, backgroundColor: `${color}14`, borderColor: `${color}33` }}
+    >
+      <span className="h-[6px] w-[6px] rounded-full" style={{ backgroundColor: color }} />
+      {departmentLabel(department)}
     </span>
   );
 }

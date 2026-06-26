@@ -30,6 +30,8 @@ export type StockStatus = "old" | "becoming" | "both" | "healthy";
 export interface RawArticleRow {
   article: string;
   articleCode: string;
+  /** Elkjøp department / "Category" column: Telecom, Computing, CE, MDA, SDA … */
+  department: string;
   qty: number;
   obsoleteNow: number; // Value Obsolete Yesterday
   change1m: number; // yesterday → +1 mnd
@@ -82,6 +84,15 @@ export interface CategorySlice {
   criticalCount: number;
 }
 
+export interface DepartmentSlice {
+  department: string;
+  obsoleteNow: number;
+  becoming: number;
+  qty: number;
+  skuCount: number;
+  criticalCount: number;
+}
+
 /** Aggregated figures for a slice of articles. */
 export interface Aggregates {
   obsoleteNow: number; // total avskrevet verdi NÅ
@@ -100,6 +111,7 @@ export interface Aggregates {
   watchCount: number;
   healthyCount: number;
   byCategory: Record<ProductCategory, CategorySlice>;
+  byDepartment: Record<string, DepartmentSlice>;
 }
 
 /** One uploaded file = one dated daily snapshot of a store. */
@@ -108,7 +120,8 @@ export interface Snapshot {
   store: string;
   chain: string;
   currency: string;
-  articleCategory: string; // e.g. "Telecom" (from footer)
+  articleCategory: string; // legacy single-category label (from footer)
+  departments: string[]; // distinct departments in this snapshot, by value desc
   fileName: string;
   date: string; // YYYY-MM-DD (snapshot day)
   uploadedAt: number;

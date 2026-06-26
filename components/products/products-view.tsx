@@ -9,12 +9,13 @@ import { DataTable, type Column } from "@/components/ui/data-table";
 import { Segmented } from "@/components/ui/segmented";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { StatusChip, ScoreBadge } from "@/components/ui/badges";
+import { StatusChip, ScoreBadge, DepartmentTag } from "@/components/ui/badges";
 import { CopyCode } from "@/components/ui/copy-code";
 import { ProductThumb } from "@/components/product/product-thumb";
 import { ProductDetailSlideOver } from "@/components/product/product-detail-slideover";
 import { formatCompactShort, formatNumber } from "@/lib/format";
-import { CATEGORY_LABEL } from "@/lib/ui-tokens";
+
+const MAX_ROWS = 400;
 
 type StatusFilter = "play" | "old" | "becoming" | "all";
 
@@ -25,17 +26,33 @@ export function ProductsView() {
   const [statusF, setStatusF] = useState<StatusFilter>("play");
   const [selected, setSelected] = useState<Article | null>(null);
 
-  const rows = useMemo(() => {
+  const filtered = useMemo(() => {
     if (!scoped) return [];
     const q = query.trim().toLowerCase();
     return scoped.articles.filter((a) => {
       if (statusF === "play" && !a.isOld && !a.isBecoming) return false;
       if (statusF === "old" && !a.isOld) return false;
       if (statusF === "becoming" && !a.isBecoming) return false;
-      if (q && !a.article.toLowerCase().includes(q) && !a.brand.toLowerCase().includes(q)) return false;
+      if (
+        q &&
+        !a.article.toLowerCase().includes(q) &&
+        !a.brand.toLowerCase().includes(q) &&
+        !a.articleCode.toLowerCase().includes(q)
+      )
+        return false;
       return true;
     });
   }, [scoped, query, statusF]);
+
+  // Cap rendered rows for the large multi-department dataset (top by exposure).
+  const total = filtered.length;
+  const rows = useMemo(
+    () =>
+      [...filtered]
+        .sort((a, b) => b.obsoleteNow - a.obsoleteNow || b.totalChange - a.totalChange)
+        .slice(0, MAX_ROWS),
+    [filtered]
+  );
 
   const columns: Column<Article>[] = useMemo(
     () => [
@@ -49,9 +66,10 @@ export function ProductsView() {
             <ProductThumb category={a.category} size={36} />
             <div className="min-w-0">
               <div className="truncate font-medium text-ink-primary">{a.article}</div>
-              <div className="mt-[3px] flex items-center gap-s2">
+              <div className="mt-[3px] flex flex-wrap items-center gap-s2">
                 {a.articleCode && <CopyCode code={a.articleCode} size="xs" />}
-                <span className="text-[11px] text-ink-tertiary">{CATEGORY_LABEL[a.category]} · {a.brand}</span>
+                <DepartmentTag department={a.department} />
+                {a.brand !== "Other" && <span className="text-[11px] text-ink-tertiary">{a.brand}</span>}
               </div>
             </div>
           </div>
@@ -95,9 +113,11 @@ export function ProductsView() {
           />
         </div>
         <div className="flex items-center gap-s3">
-          <span className="tnum text-label text-ink-tertiary">{formatNumber(rows.length)} produkter</span>
-          <Button variant="ghost" size="sm" onClick={() => import("@/lib/export").then((m) => m.exportArticlesToCsv(rows, `produkter-${scoped.store}.csv`))}>
-            <Download size={15} /> Eksporter
+          <span className="tnum text-label text-ink-tertiary">
+            {total > MAX_ROWS ? `Viser ${MAX_ROWS} av ${formatNumber(total)}` : `${formatNumber(total)} produkter`}
+          </span>
+          <Button variant="ghost" size="sm" onClick={() => import("@/lib/export").then((m) => m.exportArticlesToCsv(filtered, `produkter-${scoped.store}.csv`))}>
+            <Download size={15} /> Eksporter ({formatNumber(total)})
           </Button>
         </div>
       </div>
