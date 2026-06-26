@@ -70,8 +70,12 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       const stored = await getAllSnapshots();
       if (!alive) return;
-      setSnapshots(stored);
-      setActiveStoreState(stored[stored.length - 1]?.store ?? null);
+      // Ignore any legacy snapshot missing the current schema fields.
+      const valid = stored.filter(
+        (s) => Array.isArray(s.departments) && s.aggregates?.byDepartment
+      );
+      setSnapshots(valid);
+      setActiveStoreState(valid[valid.length - 1]?.store ?? null);
       setWorkflowMap(loadWorkflowMap());
       try {
         setHiddenDepartments(JSON.parse(localStorage.getItem(HIDDEN_DEPTS_KEY) || "[]"));

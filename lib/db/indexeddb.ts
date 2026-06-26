@@ -8,7 +8,9 @@ import type { Snapshot } from "@/types/domain";
  */
 
 const DB_NAME = "elkjop-old-stock";
-const DB_VERSION = 2;
+// v3: added the department dimension — older snapshots are incompatible and are
+// cleared on upgrade so the app never reads a snapshot missing the new fields.
+const DB_VERSION = 3;
 const STORE = "snapshots";
 
 function openDB(): Promise<IDBDatabase> {
@@ -20,11 +22,11 @@ function openDB(): Promise<IDBDatabase> {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
-      // v1 used an object store named "datasets"; drop it and create "snapshots".
+      // v1 used an object store named "datasets"; drop it.
       if (db.objectStoreNames.contains("datasets")) db.deleteObjectStore("datasets");
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE, { keyPath: "id" });
-      }
+      // Schema changed (department dimension) — reset incompatible snapshots.
+      if (db.objectStoreNames.contains(STORE)) db.deleteObjectStore(STORE);
+      db.createObjectStore(STORE, { keyPath: "id" });
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
