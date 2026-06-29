@@ -30,7 +30,7 @@ export function ProductCard({
   const apply = (e: React.MouseEvent) => {
     e.stopPropagation();
     setWorkflow(store, article.key, "In progress");
-    toast(`${article.recommendation.label} startet · ${article.article.slice(0, 38)}`);
+    toast(`Tiltak startet · ${article.article.slice(0, 38)}`);
   };
 
   return (
@@ -87,7 +87,7 @@ export function ProductCard({
           <div className="mt-s3 flex items-center gap-s2">
             {article.recommendation.type !== "ingen" ? (
               <Button size="sm" variant="primary" onClick={apply}>
-                {article.recommendation.label}
+                Start tiltak
               </Button>
             ) : (
               <Button size="sm" variant="ghost" onClick={apply}>

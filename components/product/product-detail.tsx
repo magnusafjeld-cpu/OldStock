@@ -100,7 +100,7 @@ export function ProductDetail({ article, store }: { article: Article; store: str
         {/* recommendation */}
         <div className="rounded-card border border-brand-green/25 bg-brand-green-soft/70 p-s5">
           <div className="overline mb-s2" style={{ color: "#15924C" }}>
-            Anbefalt tiltak
+            Mulig tiltak
           </div>
           <div className="text-h3 text-ink-primary">{article.recommendation.label}</div>
           <p className="mt-1 text-label text-ink-secondary">{article.recommendation.detail}</p>

@@ -19,7 +19,7 @@ export function exportArticlesToCsv(articles: Article[], fileName: string): void
     "Prognose +3 mnd",
     "Total endring (3 mnd)",
     "I kampanje",
-    "Anbefalt tiltak",
+    "Mulig tiltak",
     "Estimert effekt (NOK)",
   ];
 

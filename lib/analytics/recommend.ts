@@ -13,13 +13,13 @@ interface RecommendInput {
 }
 
 /**
- * Recommends the next action (Norwegian) and quantifies the impact:
- *  - "becoming" → sell now to PREVENT a write-down (impact = future write-down).
- *  - "old/both" → clear to free tied-up capital (impact = obsolete + future).
+ * Suggests a *possible* measure (Norwegian) and quantifies the upside. The tool
+ * never prescribes a concrete discount (e.g. a fixed percentage) — it surfaces
+ * options such as price reduction or clearance and leaves the call to the team.
  */
 export function recommendAction(input: RecommendInput): Recommendation {
   const { status, tier, obsoleteNow, totalChange, change1m, qty, inCampaign, flags } = input;
-  const units = qty > 0 ? `${qty} stk` : "varene";
+  const units = qty > 0 ? `${qty} stk` : "beholdningen";
 
   if (status === "healthy") {
     return { type: "ingen", label: "Ingen tiltak", detail: "Ikke old stock og ingen avskrivning ventet.", estImpact: 0 };
@@ -46,23 +46,25 @@ export function recommendAction(input: RecommendInput): Recommendation {
     };
   }
 
-  // BECOMING old stock — the highest-leverage case: sell before the write-down lands.
+  // BECOMING old stock — act before the write-down lands.
   if (status === "becoming") {
     const horizon = change1m > totalChange * 0.45 ? "innen 1 mnd" : "innen 3 mnd";
     return {
-      type: "selg",
-      label: "Selg nå",
-      detail: `Selg ${units} nå og unngå avskrivning på ~${formatCompactShort(totalChange)} NOK ${horizon}.`,
+      type: "prisned",
+      label: "Prisreduksjon",
+      detail: `Selges før det blir old stock. Mulig tiltak: reduksjon i pris eller utsalg av ${units} for å unngå ~${formatCompactShort(
+        totalChange
+      )} NOK i avskrivning ${horizon}.`,
       estImpact: totalChange,
     };
   }
 
-  // Demo / used / outlet that is already old → liquidate.
+  // Demo / used that is already old → clearance channel.
   if (flags.demo || flags.used) {
     return {
       type: "selg",
-      label: "Selg ut demo/brukt",
-      detail: `Selg ut ${units} via outlet før verdien faller videre.`,
+      label: "Utsalg",
+      detail: `Mulig tiltak: selg ut ${units} via outlet før verdien faller videre.`,
       estImpact: obsoleteNow + Math.max(0, totalChange),
     };
   }
@@ -71,12 +73,14 @@ export function recommendAction(input: RecommendInput): Recommendation {
   const worsening = status === "both";
   return {
     type: "prisned",
-    label: "Sett ned pris",
+    label: "Prisreduksjon",
     detail: worsening
-      ? `Allerede old stock og øker. Prioriter utsalg av ${units} for å frigjøre ~${formatCompactShort(
+      ? `Allerede old stock og øker. Mulig tiltak: reduksjon i pris eller utsalg av ${units} for å frigjøre ~${formatCompactShort(
           obsoleteNow + totalChange
         )} NOK.`
-      : `Sett ned pris / selg ut ${units} for å frigjøre ~${formatCompactShort(obsoleteNow)} NOK bunden kapital.`,
+      : `Allerede old stock. Mulig tiltak: reduksjon i pris eller utsalg av ${units} for å frigjøre ~${formatCompactShort(
+          obsoleteNow
+        )} NOK bunden kapital.`,
     estImpact: obsoleteNow + Math.max(0, totalChange),
   };
 }
